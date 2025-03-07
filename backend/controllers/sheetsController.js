@@ -1,15 +1,41 @@
 import GoogleSheetsService from '../services/googleSheetsService.js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Initialize Google Sheets service with credentials
-const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS || '{}');
+let credentials;
+try {
+  const credentialsString = process.env.GOOGLE_SHEETS_CREDENTIALS;
+  if (!credentialsString) {
+    throw new Error('GOOGLE_SHEETS_CREDENTIALS environment variable is not set');
+  }
+  credentials = JSON.parse(credentialsString);
+  
+  if (!credentials.client_email) {
+    throw new Error('client_email is missing in the credentials');
+  }
+  if (!credentials.private_key) {
+    throw new Error('private_key is missing in the credentials');
+  }
+} catch (error) {
+  console.error('Error parsing Google Sheets credentials:', error);
+  throw error;
+}
+
 const sheetsService = new GoogleSheetsService(credentials);
 
 export const createSpreadsheet = async (req, res) => {
   try {
     const { title } = req.body;
+    if (!title) {
+      return res.status(400).json({ message: 'Title is required' });
+    }
     const spreadsheet = await sheetsService.createSpreadsheet(title);
     res.json(spreadsheet);
   } catch (error) {
+    console.error('Error in createSpreadsheet:', error);
     res.status(500).json({ message: 'Error creating spreadsheet', error: error.message });
   }
 };
