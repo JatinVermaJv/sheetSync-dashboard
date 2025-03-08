@@ -4,7 +4,16 @@ import {
   createSpreadsheet,
   getSpreadsheetData,
   updateSpreadsheetData,
-  appendSpreadsheetData
+  appendSpreadsheetData,
+  addColumn,
+  getColumns,
+  updateColumn,
+  deleteColumn,
+  reorderColumns,
+  getTableData,
+  addRow,
+  updateRow,
+  deleteRow
 } from '../controllers/sheetsController.js';
 
 const router = express.Router();
@@ -12,16 +21,23 @@ const router = express.Router();
 // All routes require authentication
 router.use(auth);
 
-// Create a new spreadsheet
+// Spreadsheet operations
 router.post('/create', createSpreadsheet);
-
-// Get data from a spreadsheet
 router.get('/:spreadsheetId/:range', getSpreadsheetData);
-
-// Update data in a spreadsheet
 router.put('/:spreadsheetId/:range', updateSpreadsheetData);
-
-// Append data to a spreadsheet
 router.post('/:spreadsheetId/:range', appendSpreadsheetData);
+
+// Dynamic column operations
+router.get('/:spreadsheetId/columns', getColumns);
+router.post('/:spreadsheetId/columns', addColumn);
+router.put('/:spreadsheetId/columns/:columnName', updateColumn);
+router.delete('/:spreadsheetId/columns/:columnName', deleteColumn);
+router.put('/:spreadsheetId/columns/reorder', reorderColumns);
+
+// Table data operations
+router.get('/:spreadsheetId/data', getTableData);
+router.post('/:spreadsheetId/data', addRow);
+router.put('/:spreadsheetId/data/:rowIndex', updateRow);
+router.delete('/:spreadsheetId/data/:rowIndex', deleteRow);
 
 export default router; 

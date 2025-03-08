@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { CreateTableForm } from '../components/CreateTableForm';
 import { TablesList } from '../components/TablesList';
+import TableView from '../components/TableView';
 
 export const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -20,6 +21,11 @@ export const Dashboard = () => {
 
   const handleTableSelect = (table) => {
     setSelectedTable(table);
+    setShowCreateForm(false);
+  };
+
+  const handleBack = () => {
+    setSelectedTable(null);
   };
 
   return (
@@ -46,25 +52,41 @@ export const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Header with Create Table button */}
+        {/* Header */}
         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Your Tables</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {selectedTable ? selectedTable.name : 'Your Tables'}
+            </h2>
             <p className="mt-1 text-sm text-gray-500">
-              Create and manage your data tables
+              {selectedTable
+                ? `Manage your table data and columns`
+                : 'Create and manage your data tables'}
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
-          >
-            Create New Table
-          </button>
+          {!selectedTable && (
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
+            >
+              Create New Table
+            </button>
+          )}
+          {selectedTable && (
+            <button
+              onClick={handleBack}
+              className="bg-gray-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-600"
+            >
+              Back to Tables
+            </button>
+          )}
         </div>
 
         {/* Main content area */}
         <div className="px-4 py-6 sm:px-0">
-          {showCreateForm ? (
+          {selectedTable ? (
+            <TableView spreadsheetId={selectedTable.id} />
+          ) : showCreateForm ? (
             <CreateTableForm
               onSubmit={handleCreateTable}
               onCancel={() => setShowCreateForm(false)}

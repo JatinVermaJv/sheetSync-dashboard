@@ -2,13 +2,19 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
 import authRoutes from './routes/auth.js';
 import sheetsRoutes from './routes/sheets.js';
+import socketService from './services/socketService.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
+
+// Initialize socket service
+socketService.initialize(httpServer);
 
 // Middleware
 app.use(cors());
@@ -56,6 +62,6 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
